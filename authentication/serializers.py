@@ -8,8 +8,8 @@ from rest_framework.exceptions import AuthenticationFailed
 class RegistrationSerializer(ModelSerializer[CustomUser]):
     class Meta:
         model = CustomUser
-        fields = ['id', 'first_name', 'last_name', 'email', 'birth_date', 'password',
-                  'date_registration']
+        fields = ['first_name', 'last_name', 'email', 'birth_date', 'password',
+                  'registration_date']
 
     def create(self, validated_data):
         return CustomUser.objects.create_user(first_name=validated_data['first_name'],
@@ -54,17 +54,15 @@ class LoginSerializer(Serializer[CustomUser]):
 
 
 class LogoutSerializer(Serializer[CustomUser]):
-    token = CharField()
+    refresh = CharField()
 
-    def validate(self, attrs):  # type: ignore
+    def validate(self, attrs):
         self.token = attrs['refresh']
         return attrs
 
-    def save(self, **kwargs):  # type: ignore
-        """Validate save backlisted token."""
-
+    def save(self, **kwargs):
         try:
-            RefreshToken(self.token).blacklist()
-
-        except TokenError as ex:
-            raise AuthenticationFailed(ex)
+            refresh_token = RefreshToken(self.token)
+            refresh_token.blacklist()
+        except TokenError as e:
+            raise AuthenticationFailed(e)

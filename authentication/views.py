@@ -19,9 +19,9 @@ class RegistrationView(APIView):
             "last_name": serializer.data['last_name'],
             "email": serializer.data['email'],
             "birth_date": serializer.data['birth_date'],
-            "reg_date": serializer.data['date_registration'],
+            "registration_date": serializer.data['registration_date']
         }
-        return Response(response_data, status=status.HTTP_201_CREATED)  # изменить возврат
+        return Response(response_data, status=status.HTTP_201_CREATED)
 
 
 class LoginView(APIView):

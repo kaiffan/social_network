@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/5.0/ref/settings/
 """
 
 from dotenv import load_dotenv
+from datetime import timedelta
 from pathlib import Path
 from os import getenv
 
@@ -25,13 +26,9 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = 'django-insecure-!oo*7(7y(et%vr#u_od2rkk)@kpj-a9n0qlwtzu@il%=s3!=d='
 
-# SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
-
 # Application definition
-
 INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
@@ -39,9 +36,13 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'rest_framework_simplejwt',
+    'rest_framework_simplejwt.token_blacklist',
     'rest_framework',
     'corsheaders',
-    'authentication'
+    'authentication',
+    'dialogue',
+    'message'
 ]
 
 MIDDLEWARE = [
@@ -52,6 +53,8 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
+    'django.middleware.common.CommonMiddleware',
 ]
 
 ROOT_URLCONF = 'social_network.urls'
@@ -114,10 +117,21 @@ REST_FRAMEWORK = {
     ],
 }
 
-CORS_ALLOW_CREDENTIALS = True
-CORS_ORIGIN_WHITELIST = [
-    'http://localhost:3000'
-]
+SIMPLE_JWT = {
+    'ACCESS_TOKEN_LIFETIME': timedelta(days=1),
+    'REFRESH_TOKEN_LIFETIME': timedelta(days=7),
+    'ALGORITHM': 'HS256',
+    'SIGNING_KEY': SECRET_KEY,
+    'VERIFYING_KEY': None,
+    'TOKEN_USER_CLASS': 'rest_framework_simplejwt.models.TokenUser',
+    'USER_ID_FIELD': 'id',
+    'USER_ID_CLAIM': 'user_id',
+    'ROTATE_REFRESH_TOKENS': True,
+    'BLACKLIST_AFTER_ROTATION': True
+}
+
+CORS_ORIGIN_ALLOW_ALL = True
+ALLOWED_HOSTS = ['*']
 
 # Internationalization
 # https://docs.djangoproject.com/en/5.0/topics/i18n/
