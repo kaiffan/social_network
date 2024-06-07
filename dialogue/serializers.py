@@ -1,5 +1,5 @@
-from rest_framework.serializers import ModelSerializer, CharField, SerializerMethodField, ValidationError, Serializer
-from dialogue.models import Dialogue, DialogueUser
+from rest_framework.serializers import ModelSerializer
+from dialogue.models import Dialogue
 
 
 class DialogueSerializer(ModelSerializer[Dialogue]):

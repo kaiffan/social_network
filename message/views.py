@@ -1,4 +1,4 @@
-from message.serializers import UpdateReadFieldSerializer, MessageSerializer
+from message.serializers import UpdateMessageFieldSerializer, MessageSerializer
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
@@ -30,7 +30,7 @@ def update_message(request: Request, message_id: int) -> Response:
     except Message.DoesNotExist:
         return Response(status=status.HTTP_404_NOT_FOUND)
 
-    serializer = UpdateReadFieldSerializer(instance=message, data=request.data, partial=True)
+    serializer = UpdateMessageFieldSerializer(instance=message, data=request.data, partial=True)
     if serializer.is_valid():
         serializer.save()
         return Response(serializer.data, status=status.HTTP_200_OK)
@@ -41,7 +41,7 @@ def update_message(request: Request, message_id: int) -> Response:
 @permission_classes(permission_classes=[IsAuthenticated, ])
 def get_all_messages_in_dialogue(request: Request, dialogue_id: int) -> Response:
     try:
-        messages = Message.objects.filter(dialogue_id=dialogue_id)
+        messages = Message.objects.filter(dialogue_id=dialogue_id).all()
     except Message.DoesNotExist:
         return Response(status=status.HTTP_404_NOT_FOUND)
 
@@ -52,9 +52,10 @@ def get_all_messages_in_dialogue(request: Request, dialogue_id: int) -> Response
 
 
 @api_view(http_method_names=['GET'])
-def get_last_messages_in_dialogue(request: Request, user_id: int) -> Response:
+@permission_classes(permission_classes=[IsAuthenticated, ])
+def get_last_messages_in_dialogue(request: Request) -> Response:
     try:
-        user_dialogues_rows = DialogueUser.objects.filter(user_id=user_id).all()
+        user_dialogues_rows = DialogueUser.objects.filter(user_id=request.user.id).all()
         user_dialogues = [row.dialogue_id for row in user_dialogues_rows]
     except DialogueUser.DoesNotExist:
         return Response(status=status.HTTP_404_NOT_FOUND)

@@ -15,7 +15,7 @@ class MessageSerializer(ModelSerializer[Message]):
         ]
 
 
-class UpdateReadFieldSerializer(ModelSerializer[Message]):
+class UpdateMessageFieldSerializer(ModelSerializer[Message]):
     class Meta:
         model = Message
         fields = ['is_read', 'text', 'avatar']
