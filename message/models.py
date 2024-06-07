@@ -5,7 +5,6 @@ from dialogue.models import Dialogue
 
 class Message(models.Model):
     text = models.TextField(name="text", null=False)
-    avatar = models.URLField(name="avatar", null=False)
     date_receive = models.DateTimeField(name="date_receive", null=False, auto_now_add=True)
     is_read = models.BooleanField(name="is_read", null=False, default=False)
     id_user_sender = models.ForeignKey(
