@@ -42,7 +42,8 @@ INSTALLED_APPS = [
     'corsheaders',
     'authentication',
     'dialogue',
-    'message'
+    'message',
+    'friend'
 ]
 
 MIDDLEWARE = [
