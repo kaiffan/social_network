@@ -6,8 +6,9 @@ class MessageSerializer(ModelSerializer[Message]):
     class Meta:
         model = Message
         fields = [
+            'id',
             'text',
-            'avatar',
+            'date_receive',
             'is_read',
             "user_sender_id",
             "user_recipient_id",
@@ -18,4 +19,4 @@ class MessageSerializer(ModelSerializer[Message]):
 class UpdateMessageFieldSerializer(ModelSerializer[Message]):
     class Meta:
         model = Message
-        fields = ['is_read', 'text', 'avatar']
+        fields = ['is_read', 'text']

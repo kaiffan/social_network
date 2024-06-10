@@ -66,3 +66,9 @@ class LogoutSerializer(Serializer[CustomUser]):
             refresh_token.blacklist()
         except TokenError as e:
             raise AuthenticationFailed(e)
+
+
+class ShortCustomUserSerializer(ModelSerializer[CustomUser]):
+    class Meta:
+        model = CustomUser
+        fields = ['first_name', 'last_name', 'email']

@@ -41,12 +41,15 @@ def update_status_friend(request: Request, friend_id: int) -> Response:
 @permission_classes(permission_classes=[IsAuthenticated, ])
 def get_all_friends_user(request: Request) -> Response:
     try:
-        friends = Friend.objects.filter(user_id=request.user.id).all()
+        friends = Friend.objects.filter(user_id=request.user.id).filter(status="ACCEPTED").all()
     except Friend.DoesNotExist:
         return Response(status=status.HTTP_404_NOT_FOUND)
 
     if request.method == "GET":
-        serializer = FriendSerializer(friends, many=True)
+        serializer = FriendSerializer(
+            friends,
+            many=True
+        )
         return Response(data=serializer.data, status=status.HTTP_200_OK)
     return Response(status=status.HTTP_400_BAD_REQUEST)
 

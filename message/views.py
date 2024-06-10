@@ -55,7 +55,7 @@ def get_all_messages_in_dialogue(request: Request, dialogue_id: int) -> Response
 @permission_classes(permission_classes=[IsAuthenticated, ])
 def get_last_messages_in_dialogue(request: Request) -> Response:
     try:
-        user_dialogues_rows = DialogueUser.objects.filter(user_id=request.user.id).all()
+        user_dialogues_rows = DialogueUser.objects.filter(user_sender=request.user.id).all()
         user_dialogues = [row.dialogue_id for row in user_dialogues_rows]
     except DialogueUser.DoesNotExist:
         return Response(status=status.HTTP_404_NOT_FOUND)
@@ -69,6 +69,7 @@ def get_last_messages_in_dialogue(request: Request) -> Response:
         ).select_related('dialogue')
         return Response(
             data=messages.values(
+                'id',
                 'text',
                 'date_receive',
                 'dialogue__title',
