@@ -1,4 +1,5 @@
-from rest_framework.serializers import ModelSerializer, CharField, SerializerMethodField, ValidationError, Serializer
+from rest_framework.serializers import ModelSerializer, BooleanField, CharField, SerializerMethodField, ValidationError, \
+    Serializer
 from authentication.models import CustomUser
 from django.contrib.auth import authenticate
 from rest_framework_simplejwt.tokens import RefreshToken, TokenError
@@ -8,8 +9,7 @@ from rest_framework.exceptions import AuthenticationFailed
 class RegistrationSerializer(ModelSerializer[CustomUser]):
     class Meta:
         model = CustomUser
-        fields = ['first_name', 'last_name', 'email', 'birth_date', 'password',
-                  'registration_date']
+        fields = ['first_name', 'last_name', 'email', 'birth_date', 'password']
 
     def create(self, validated_data):
         return CustomUser.objects.create_user(first_name=validated_data['first_name'],
@@ -22,18 +22,18 @@ class RegistrationSerializer(ModelSerializer[CustomUser]):
 class LoginSerializer(Serializer[CustomUser]):
     email = CharField(max_length=255)
     password = CharField(max_length=128, write_only=True)
-
+    theme = BooleanField(source="get_theme", read_only=True)
     tokens = SerializerMethodField()
+
+    class Meta:
+        model = CustomUser
+        fields = ['email', 'password', 'tokens', 'theme']
 
     def get_tokens(self, obj):
         user = CustomUser.objects.get(email=obj.email)
         return {'refresh': user.tokens['refresh'], 'access': user.tokens['access']}
 
-    class Meta:
-        model = CustomUser
-        fields = ['email', 'password', 'tokens']
-
-    def validate(self, data):  # type: ignore
+    def validate(self, data):
         email = data.get('email', None)
         password = data.get('password', None)
         if email is None:
