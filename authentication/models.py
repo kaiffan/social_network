@@ -11,6 +11,8 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
     birth_date = models.DateField("birth_date", null=False)
     password = models.CharField("password", max_length=255, default="", null=False)
     registration_date = models.DateTimeField("registration_date", auto_now_add=True, null=False)
+    avatar = models.CharField(name="avatar", max_length=255, null=False, default="обычная аватарка пользователя")
+    theme = models.BooleanField("theme", max_length=255, null=False, default=False)
     is_active = models.BooleanField(default=True)
     is_staff = models.BooleanField(default=False)
 
