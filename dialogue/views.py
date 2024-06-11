@@ -37,13 +37,18 @@ def add_dialogue(request: Request, user_recipient_id: int) -> Response:
         dialogue_serializer.is_valid(raise_exception=True)
         dialogue = dialogue_serializer.save()
         try:
-            dialogue_user = DialogueUser(
+            dialogue_user_sender = DialogueUser(
                 dialogue_id=dialogue.id,
                 user_sender_id=request.user.id,
                 user_recipient_id=user_recipient_id
             )
-            DialogueUser.save(dialogue_user)
+            dialogue_user_recipient = DialogueUser(
+                dialogue_id=dialogue.id,
+                user_sender_id=user_recipient_id,
+                user_recipient_id=request.user.id
+            )
+            DialogueUser.objects.bulk_create([dialogue_user_sender, dialogue_user_recipient])
         except IntegrityError:
             return Response(data={"error": "This dialogue user already exists."}, status=status.HTTP_400_BAD_REQUEST)
-        return Response(data=dialogue_user.dialogue_id, status=status.HTTP_201_CREATED)
+        return Response(data=dialogue.id, status=status.HTTP_201_CREATED)
     return Response(dialogue_serializer.errors, status=status.HTTP_400_BAD_REQUEST)

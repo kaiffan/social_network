@@ -57,6 +57,7 @@ def get_last_messages_in_dialogue(request: Request) -> Response:
     try:
         user_dialogues_rows = DialogueUser.objects.filter(user_sender=request.user.id).all()
         user_dialogues = [row.dialogue_id for row in user_dialogues_rows]
+        print(*user_dialogues, sep=" ")
     except DialogueUser.DoesNotExist:
         return Response(status=status.HTTP_404_NOT_FOUND)
     if request.method == "GET":
