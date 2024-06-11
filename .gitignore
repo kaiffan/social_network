@@ -29,3 +29,5 @@ env.bak/
 venv.bak/
 
 __pycache__
+
+/static/images/
