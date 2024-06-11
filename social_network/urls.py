@@ -12,4 +12,5 @@ urlpatterns = [
     path('', include('dialogue.urls')),
     path('', include('friend.urls')),
     path('', include('search.urls')),
+    path('', include('attachments.urls')),
 ]

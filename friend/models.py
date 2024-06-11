@@ -27,4 +27,4 @@ class Friend(models.Model):
 
     class Meta:
         db_table = 'friend'
-        unique_together = ('user_id', 'friend_id')  # Добавить чтобы не мог пользователь добавить в друзья сам себя
+        unique_together = ('user_id', 'friend_id')

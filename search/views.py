@@ -12,16 +12,21 @@ from authentication.models import CustomUser
 
 from django.core.cache import cache
 
+from fuzzywuzzy import process
+
 
 @api_view(http_method_names=['GET'])
 @permission_classes(permission_classes=[IsAuthenticated])
 def search_users_by_email(request: Request, keyword: str) -> Response:
     cache_key: str = f'friends_' + keyword
-    users = cache.get(cache_key)
-    if not users:
-        users = list(CustomUser.objects.filter(email__icontains=keyword).all())
-        cache.set(cache_key, users, timeout=300)
-    serializer: ShortCustomUserSerializer = ShortCustomUserSerializer(users, many=True)
+    user_cache = cache.get(cache_key)
+    if not user_cache:
+        user_cache = CustomUser.objects.all()
+        matches = process.extract(keyword, [user.email for user in user_cache], limit=5)
+        top_users_emails = [match[0] for match in matches]
+        user_cache = CustomUser.objects.filter(email__in=top_users_emails)
+        cache.set(cache_key, user_cache, timeout=150)
+    serializer: ShortCustomUserSerializer = ShortCustomUserSerializer(user_cache, many=True)
     return Response(data=serializer.data, status=status.HTTP_200_OK)
 
 
@@ -29,9 +34,12 @@ def search_users_by_email(request: Request, keyword: str) -> Response:
 @permission_classes(permission_classes=[IsAuthenticated])
 def search_messages_in_dialogue(request: Request, keyword: str, id_dialogue: int) -> Response:
     cache_key: str = f'messages_' + keyword
-    messages = cache.get(cache_key)
-    if not messages:
-        messages = list(Message.objects.filter(id_dialogue=id_dialogue).filter(content__contains=keyword).all())
-        cache.set(cache_key, messages, timeout=1200)
-    serializer: MessageSerializer = MessageSerializer(messages, many=True)
+    messages_in_dialogue = cache.get(cache_key)
+    if not messages_in_dialogue:
+        messages_in_dialogue = Message.objects.filter(id_dialogue=id_dialogue).all()
+        matches = process.extract(keyword, [message.text for message in messages_in_dialogue], limit=15)
+        top_text_messages = [match[0] for match in matches]
+        messages_in_dialogue = Message.objects.filter(id_dialogue=id_dialogue).filter(text__in=top_text_messages)
+        cache.set(cache_key, messages_in_dialogue, timeout=75)
+    serializer: MessageSerializer = MessageSerializer(messages_in_dialogue, many=True)
     return Response(data=serializer.data, status=status.HTTP_200_OK)

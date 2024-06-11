@@ -32,11 +32,3 @@ class FriendUpdateFieldSerializer(ModelSerializer[Friend]):
     class Meta:
         model = Friend
         fields = ['status']
-
-
-class FriendAddSerializer(ModelSerializer[Friend]):
-    class Meta:
-        model = Friend
-        fields = [
-            'friend_id'
-        ]

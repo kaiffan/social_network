@@ -8,6 +8,7 @@ from rest_framework import status
 from django.core.files.storage import default_storage
 
 from personal_account.serializers import UpdateUserFieldSerializer
+from attachments.views import save_file_in_localhost
 from authentication.models import CustomUser
 from dotenv import load_dotenv
 
@@ -37,15 +38,13 @@ def upload_image(request: Request) -> Response:
     uploaded_file = request.FILES.get('image')
     if uploaded_file.name != '':
         name, extension = uploaded_file.name.split(".")
-        print(name)
         filename = os.path.join(
             os.getenv('UPLOAD_DIRECTORY'),
             name[:-2] + "_" + str(request.user.id) + "." + extension
         )
-        print(filename)
         if os.path.exists(filename):
             os.remove(filename)
-        default_storage.save(filename, ContentFile(uploaded_file.read()))
+        save_file_in_localhost(filename=filename, uploaded_file=uploaded_file)
         return Response(data={"message": "File uploaded successfully"}, status=status.HTTP_201_CREATED)
     else:
         return Response(data={"error": "No file provided"}, status=status.HTTP_400_BAD_REQUEST)
