@@ -31,3 +31,4 @@ venv.bak/
 __pycache__
 
 /static/images/
+/django_cache/

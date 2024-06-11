@@ -15,7 +15,7 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
         name="avatar",
         max_length=255,
         null=False,
-        default="http://localhost:3000/static/images/default_avatar_user.jpg"
+        default="http://localhost:3000/static/images/default_avatar.jpg"
     )
     theme = models.BooleanField(name="theme", max_length=255, null=False, default=False)
     is_active = models.BooleanField(default=True)
