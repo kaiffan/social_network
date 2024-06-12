@@ -71,4 +71,4 @@ class LogoutSerializer(Serializer[CustomUser]):
 class ShortCustomUserSerializer(ModelSerializer[CustomUser]):
     class Meta:
         model = CustomUser
-        fields = ['first_name', 'last_name', 'email']
+        fields = ['id', 'first_name', 'last_name', 'email']

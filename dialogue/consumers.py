@@ -18,6 +18,8 @@ class DialogueConsumer(AsyncWebsocketConsumer):
                 self.channel_name
             )
 
+            # обновлять время захода в бд
+
             await self.accept()
         except KeyError as exception:
             print(f"Error: {str(exception)}")

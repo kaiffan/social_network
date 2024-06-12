@@ -12,7 +12,7 @@ from authentication.models import CustomUser
 
 from django.core.cache import cache
 
-from fuzzywuzzy import process
+from rapidfuzz import process
 
 
 @api_view(http_method_names=['GET'])
@@ -21,9 +21,9 @@ def search_users_by_email(request: Request, keyword: str) -> Response:
     cache_key: str = f'friends_' + keyword
     user_cache = cache.get(cache_key)
     if not user_cache:
-        user_cache = CustomUser.objects.all()
+        user_cache = CustomUser.objects.exclude(id=request.user.id).all()
         matches = process.extract(keyword, [user.email for user in user_cache], limit=5)
-        top_users_emails = [match[0] for match in matches]
+        top_users_emails = [match[0] for match in matches if match[1] > 50]
         user_cache = CustomUser.objects.filter(email__in=top_users_emails)
         cache.set(cache_key, user_cache, timeout=150)
     serializer: ShortCustomUserSerializer = ShortCustomUserSerializer(user_cache, many=True)
@@ -38,7 +38,7 @@ def search_messages_in_dialogue(request: Request, keyword: str, id_dialogue: int
     if not messages_in_dialogue:
         messages_in_dialogue = Message.objects.filter(id_dialogue=id_dialogue).all()
         matches = process.extract(keyword, [message.text for message in messages_in_dialogue], limit=15)
-        top_text_messages = [match[0] for match in matches]
+        top_text_messages = [match[0] for match in matches if match[1] > 70]
         messages_in_dialogue = Message.objects.filter(id_dialogue=id_dialogue).filter(text__in=top_text_messages)
         cache.set(cache_key, messages_in_dialogue, timeout=75)
     serializer: MessageSerializer = MessageSerializer(messages_in_dialogue, many=True)

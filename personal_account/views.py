@@ -34,10 +34,13 @@ def update_user_info(request: Request) -> Response:
 
 @api_view(http_method_names=['POST'])
 @permission_classes(permission_classes=[IsAuthenticated, ])
-def upload_image(request: Request) -> Response:
+def change_avatar_user(request: Request) -> Response:
+    user: CustomUser = CustomUser.objects.get(id=request.user.id)
     uploaded_file = request.FILES.get('image')
     if uploaded_file.name != '':
         name, extension = uploaded_file.name.split(".")
+        if not (extension == 'jpg' or extension == 'jpeg'):
+            return Response(data={"message": "Unsupported extension file"}, status=status.HTTP_400_BAD_REQUEST)
         filename = os.path.join(
             os.getenv('UPLOAD_DIRECTORY'),
             name[:-2] + "_" + str(request.user.id) + "." + extension
@@ -45,6 +48,8 @@ def upload_image(request: Request) -> Response:
         if os.path.exists(filename):
             os.remove(filename)
         save_file_in_localhost(filename=filename, uploaded_file=uploaded_file)
+        user.avatar = "http://127.0.0.1:3000" + default_storage.url(filename)
+        user.save()
         return Response(data={"message": "File uploaded successfully"}, status=status.HTTP_201_CREATED)
     else:
         return Response(data={"error": "No file provided"}, status=status.HTTP_400_BAD_REQUEST)

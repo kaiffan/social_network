@@ -26,9 +26,3 @@ class FriendSerializer(ModelSerializer[Friend]):
     def get_user_info(self, friend):
         friend_info = CustomUser.objects.get(id=friend.friend_id)
         return ShortCustomUserSerializer(friend_info).data
-
-
-class FriendUpdateFieldSerializer(ModelSerializer[Friend]):
-    class Meta:
-        model = Friend
-        fields = ['status']

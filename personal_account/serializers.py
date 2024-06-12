@@ -11,5 +11,6 @@ class UpdateUserFieldSerializer(ModelSerializer[CustomUser]):
             'last_name',
             'email',
             'birth_date',
-            'avatar'
+            'avatar',
+            'theme'
         ]
