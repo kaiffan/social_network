@@ -22,7 +22,7 @@ def upload_file(request: Request) -> Response:
         return Response(data={"error": "No file provided"}, status=status.HTTP_400_BAD_REQUEST)
 
 
-def save_file_in_localhost(filename: str, uploaded_file) -> None:
+def save_file_in_localhost(filename, uploaded_file) -> None:
     with open(filename, 'wb+') as destination:
         for chunk in uploaded_file.chunks():
             destination.write(chunk)

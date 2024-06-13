@@ -14,3 +14,18 @@ class UpdateUserFieldSerializer(ModelSerializer[CustomUser]):
             'avatar',
             'theme'
         ]
+
+
+class UserInfoSerializer(ModelSerializer[CustomUser]):
+    class Meta:
+        model = CustomUser
+        fields = [
+            'first_name',
+            'last_name',
+            'email',
+            'birth_date',
+            'registration_date',
+            'avatar',
+            'chat_background'
+        ]
+

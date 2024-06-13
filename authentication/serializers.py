@@ -1,3 +1,8 @@
+import datetime
+from datetime import datetime
+
+from django.contrib.auth.password_validation import validate_password
+from rest_framework import serializers
 from rest_framework.serializers import ModelSerializer, BooleanField, CharField, SerializerMethodField, ValidationError, \
     Serializer
 from authentication.models import CustomUser
@@ -12,11 +17,17 @@ class RegistrationSerializer(ModelSerializer[CustomUser]):
         fields = ['first_name', 'last_name', 'email', 'birth_date', 'password']
 
     def create(self, validated_data):
-        return CustomUser.objects.create_user(first_name=validated_data['first_name'],
-                                              last_name=validated_data['last_name'],
-                                              email=validated_data['email'],
-                                              password=validated_data['password'],
-                                              birth_date=validated_data['birth_date'])
+        return CustomUser.objects.create_user(**validated_data)
+
+    def validate_email(self, value):
+        if CustomUser.objects.filter(email=value).exists():
+            raise serializers.ValidationError("A user with that email already exists.")
+        return value
+
+    def validate_birth_date(self, value):
+        if value > datetime.now().date():
+            raise serializers.ValidationError("Birth date cannot be in the future.")
+        return value
 
 
 class LoginSerializer(Serializer[CustomUser]):
@@ -71,4 +82,16 @@ class LogoutSerializer(Serializer[CustomUser]):
 class ShortCustomUserSerializer(ModelSerializer[CustomUser]):
     class Meta:
         model = CustomUser
-        fields = ['id', 'first_name', 'last_name', 'email']
+        fields = ['id', 'first_name', 'last_name', 'email', 'avatar', 'chat_background']
+
+
+class UpdatePasswordSerializer(Serializer[CustomUser]):
+    password = CharField(max_length=128, write_only=True)
+
+    class Meta:
+        model = CustomUser
+        fields = ['password']
+
+    def validate_password(self, value):
+        validate_password(value)
+        return value

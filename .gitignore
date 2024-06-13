@@ -30,5 +30,7 @@ venv.bak/
 
 __pycache__
 
-/static/images/
+/static/avatars/
+/static/attachments/
+/static/backgrounds/
 /django_cache/

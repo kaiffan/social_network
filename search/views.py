@@ -7,7 +7,7 @@ from rest_framework import status
 from message.serializers import MessageSerializer
 from message.models import Message
 
-from authentication.serializers import ShortCustomUserSerializer
+from search.serializers import SearchCustomUserSerializer
 from authentication.models import CustomUser
 
 from django.core.cache import cache
@@ -25,8 +25,12 @@ def search_users_by_email(request: Request, keyword: str) -> Response:
         matches = process.extract(keyword, [user.email for user in user_cache], limit=5)
         top_users_emails = [match[0] for match in matches if match[1] > 50]
         user_cache = CustomUser.objects.filter(email__in=top_users_emails)
+        if len(user_cache) == 0:
+            user_cache = CustomUser.objects.exclude(id=request.user.id).all()
+            serializer: SearchCustomUserSerializer = SearchCustomUserSerializer(user_cache, many=True)
+            return Response(serializer.data, status=status.HTTP_200_OK)
         cache.set(cache_key, user_cache, timeout=150)
-    serializer: ShortCustomUserSerializer = ShortCustomUserSerializer(user_cache, many=True)
+    serializer: SearchCustomUserSerializer = SearchCustomUserSerializer(user_cache, many=True)
     return Response(data=serializer.data, status=status.HTTP_200_OK)
 
 
